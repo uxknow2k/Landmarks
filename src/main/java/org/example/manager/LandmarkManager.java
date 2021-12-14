@@ -49,13 +49,31 @@ public class LandmarkManager {
         return responseDTO;
     }
 
+    public double getDistanceBetweenPlaces(long sourceId, double lat, double lon) {
+        LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(sourceId);
+        return distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLng(),
+                lat, lon);
+    }
+
+    public List<LandmarkSaveResponseDTO> getAllInThisRadius(long sourceId, double radius) {
+        LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(sourceId);
+        LandmarkGetAllResponseDTO responseDTO = getAll();
+        List<LandmarkSaveResponseDTO> result = new ArrayList<>();
+        for (LandmarkGetAllResponseDTO.Landmark landmark : responseDTO.getLandmarks()) {
+            if (radius > distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLng(),
+                    landmark.getLat(), landmark.getLon())) {
+                result.add(landmark);
+            }
+        }
+    }
+
     public LandmarkGetByIdResponseDTO getById(long id) {
         try {
             final LandmarkFullModel item = template.queryForObject(
                     // language=PostgreSQL
                     """
                             SELECT id, name, city, landmark_address, undergrounds,landmark_description, 
-                            landmark_web_site, landmark_phone, open, close, CURRENT_TIME BETWEEN open AND close AS available, lat, lng,  image FROM landmarks
+                            landmark_web_site, landmark_phone, open, close, CURRENT_TIME BETWEEN open AND close AS available, lat, lon,  image FROM landmarks
                             WHERE id = :id AND removed = FALSE   
                             """,
                     Map.of(
@@ -208,7 +226,7 @@ public class LandmarkManager {
         }
     }
         private double distance (double lat, double lon, double lat2, double lon2) {
-return (1111.2 * Math.sqrt((lon - lon2) * (lon - lon2) + (lat - lat2) * Math.cos(Math.PI * lon / 180) * (lat - lat2) * Math.cos(Math.PI * lon / 180)));
+            return (1111.2 * Math.sqrt((lon - lon2) * (lon - lon2) + (lat - lat2) * Math.cos(Math.PI * lon / 180) * (lat - lat2) * Math.cos(Math.PI * lon / 180)));
         }
     }
 

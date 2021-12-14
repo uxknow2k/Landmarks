@@ -25,7 +25,7 @@ public LandmarkFullModel mapRow(ResultSet rs, int rowNum) throws  SQLException {
                 rs.getString("close"),
                 rs.getBoolean("available"),
                 rs.getDouble("lat"),
-                rs.getDouble("lng"),
+                rs.getDouble("lon"),
                 rs.getString("image")
         );
     }

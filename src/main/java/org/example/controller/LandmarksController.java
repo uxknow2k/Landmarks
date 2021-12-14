@@ -8,6 +8,8 @@ import org.example.dto.LandmarkSaveResponseDTO;
 import org.example.manager.LandmarkManager;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/landmarks")
 @RequiredArgsConstructor
@@ -39,10 +41,16 @@ public class LandmarksController {
         manager.restoreById(id);
     }
 
-    @GetMapping("/distance/${id}")
+    @GetMapping("/distance/{id}")
     @ResponseBody
-    public String getFoos(@RequestParam float lat, @RequestParam float lon) {
-        manager.distance
+    public double getDistance(@PathVariable long id, @RequestParam float lat, @RequestParam float lon) {
+        return manager.getDistanceBetweenPlaces(id, lat, lon);
+    }
+
+    @GetMapping("/distance/radius/{id}")
+    @ResponseBody
+    public List<LandmarkSaveResponseDTO> getDistance(@PathVariable long id, @RequestParam int radius) {
+        return manager.getAllInThisRadius(id, radius);
     }
 }
 
