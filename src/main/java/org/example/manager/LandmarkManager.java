@@ -24,7 +24,7 @@ public class LandmarkManager {
     private final NamedParameterJdbcTemplate template;
     private final LandmarkBasicRowMapper landmarkBasicMapper;
     private final LandmarkFullRowMapper landmarkFullMapper;
-    private String defaultImage = "noimage.png";
+    private final String defaultImage = "noimage.png";
 
     public LandmarkGetAllResponseDTO getAll() {
         List<LandmarkBasicModel> items = template.query(
@@ -55,7 +55,7 @@ public class LandmarkManager {
                     // language=PostgreSQL
                     """
                             SELECT id, name, city, landmark_address, undergrounds,landmark_description, 
-                            landmark_web_site, landmark_phone, open, close, CURRENT_TIME BETWEEN open AND close AS available, image FROM landmarks
+                            landmark_web_site, landmark_phone, open, close, CURRENT_TIME BETWEEN open AND close AS available, lat, lng,  image FROM landmarks
                             WHERE id = :id AND removed = FALSE   
                             """,
                     Map.of(
@@ -75,6 +75,8 @@ public class LandmarkManager {
                     item.getOpen(),
                     item.getClose(),
                     item.getAvailable(),
+                    item.getLng(),
+                    item.getLat(),
                     item.getImage()
             ));
 
@@ -205,4 +207,8 @@ public class LandmarkManager {
             throw new LandmarkNotFoundException("landmark with id " + id + " not found");
         }
     }
-}
+        private double distance (double lat, double lon, double lat2, double lon2) {
+return (1111.2 * Math.sqrt((lon - lon2) * (lon - lon2) + (lat - lat2) * Math.cos(Math.PI * lon / 180) * (lat - lat2) * Math.cos(Math.PI * lon / 180)));
+        }
+    }
+

@@ -24,10 +24,11 @@ public class LandmarksController {
         return manager.getById(id);
     }
 
-    @PostMapping ("/save")
+    @PostMapping("/save")
     public LandmarkSaveResponseDTO save(@RequestBody LandmarkSaveRequestDTO responseDTO) {
         return manager.save(responseDTO);
     }
+
     @PostMapping("/removeById/{id}")
     public void removeById(@PathVariable long id) {
         manager.removeById(id);
@@ -36,6 +37,12 @@ public class LandmarksController {
     @PostMapping("/restoreById/{id}")
     public void restoreById(@PathVariable long id) {
         manager.restoreById(id);
+    }
+
+    @GetMapping("/distance/${id}")
+    @ResponseBody
+    public String getFoos(@RequestParam float lat, @RequestParam float lon) {
+        manager.distance
     }
 }
 
