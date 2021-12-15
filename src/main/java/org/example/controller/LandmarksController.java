@@ -1,10 +1,7 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dto.LandmarkGetAllResponseDTO;
-import org.example.dto.LandmarkGetByIdResponseDTO;
-import org.example.dto.LandmarkSaveRequestDTO;
-import org.example.dto.LandmarkSaveResponseDTO;
+import org.example.dto.*;
 import org.example.manager.LandmarkManager;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,7 +46,7 @@ public class LandmarksController {
 
     @GetMapping("/distance/radius/{id}")
     @ResponseBody
-    public List<LandmarkSaveResponseDTO> getDistance(@PathVariable long id, @RequestParam int radius) {
+    public List<LandmarkGetFullAllResponseDTO.Landmark> getDistance(@PathVariable long id, @RequestParam int radius) {
         return manager.getAllInThisRadius(id, radius);
     }
 }

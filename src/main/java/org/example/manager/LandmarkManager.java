@@ -1,10 +1,7 @@
 package org.example.manager;
 
 import lombok.RequiredArgsConstructor;
-import org.example.dto.LandmarkGetAllResponseDTO;
-import org.example.dto.LandmarkGetByIdResponseDTO;
-import org.example.dto.LandmarkSaveRequestDTO;
-import org.example.dto.LandmarkSaveResponseDTO;
+import org.example.dto.*;
 import org.example.exception.LandmarkNotFoundException;
 import org.example.model.LandmarkBasicModel;
 import org.example.model.LandmarkFullModel;
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -49,22 +47,62 @@ public class LandmarkManager {
         return responseDTO;
     }
 
+    public LandmarkGetFullAllResponseDTO getFullAllResponseDTO() {
+        try {
+            final List<LandmarkFullModel> items = template.query(
+                    // language=PostgreSQL
+                    """
+                            SELECT id, name, city, landmark_address, undergrounds,landmark_description, 
+                            landmark_web_site, landmark_phone, open, close, CURRENT_TIME BETWEEN open AND close AS available, lat, lon,  image FROM landmarks
+                            WHERE removed = FALSE   
+                            """,
+                    landmarkFullMapper
+            );
+            LandmarkGetFullAllResponseDTO responseDTO = new LandmarkGetFullAllResponseDTO();
+            responseDTO.setLandmarks(items
+                    .stream()
+                    .map(item ->
+                            new LandmarkGetFullAllResponseDTO.Landmark(
+                                    item.getId(),
+                                    item.getName(),
+                                    item.getCity(),
+                                    item.getLandmarkAddress(),
+                                    item.getUndergrounds(),
+                                    item.getLandmarkDescription(),
+                                    item.getLandmarkWebSite(),
+                                    item.getLandmarkPhone(),
+                                    item.getOpen(),
+                                    item.getClose(),
+                                    item.getAvailable(),
+                                    item.getLog(),
+                                    item.getLat(),
+                                    item.getImage()
+                            ))
+                    .collect(Collectors.toList()));
+
+            return responseDTO;
+        } catch (EmptyResultDataAccessException e) {
+            throw new LandmarkNotFoundException(e);
+        }
+    }
+
     public double getDistanceBetweenPlaces(long sourceId, double lat, double lon) {
         LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(sourceId);
-        return distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLng(),
+        return distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLog(),
                 lat, lon);
     }
 
-    public List<LandmarkSaveResponseDTO> getAllInThisRadius(long sourceId, double radius) {
+    public List<LandmarkGetFullAllResponseDTO.Landmark> getAllInThisRadius(long sourceId, double radius) {
         LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(sourceId);
-        LandmarkGetAllResponseDTO responseDTO = getAll();
-        List<LandmarkSaveResponseDTO> result = new ArrayList<>();
-        for (LandmarkGetAllResponseDTO.Landmark landmark : responseDTO.getLandmarks()) {
-            if (radius > distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLng(),
-                    landmark.getLat(), landmark.getLon())) {
+        LandmarkGetFullAllResponseDTO responseDTO = getFullAllResponseDTO();
+        List<LandmarkGetFullAllResponseDTO.Landmark> result = new ArrayList<>();
+        for (LandmarkGetFullAllResponseDTO.Landmark landmark : responseDTO.getLandmarks()) {
+            if (radius > distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLog(),
+                    landmark.getLat(), landmark.getLog())) {
                 result.add(landmark);
             }
         }
+        return result;
     }
 
     public LandmarkGetByIdResponseDTO getById(long id) {
@@ -93,7 +131,7 @@ public class LandmarkManager {
                     item.getOpen(),
                     item.getClose(),
                     item.getAvailable(),
-                    item.getLng(),
+                    item.getLog(),
                     item.getLat(),
                     item.getImage()
             ));

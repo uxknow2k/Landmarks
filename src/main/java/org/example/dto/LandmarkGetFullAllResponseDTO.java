@@ -9,8 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-
-public class LandmarkGetAllResponseDTO {
+public class LandmarkGetFullAllResponseDTO {
     private List<Landmark> landmarks;
 
     @NoArgsConstructor
@@ -20,10 +19,17 @@ public class LandmarkGetAllResponseDTO {
         private long id;
         private String name;
         private String city;
+        private String landmarkAddress;
+        private String undergrounds;
         private String landmarkDescription;
+        private String landmarkWebSite;
         private String landmarkPhone;
+        private String open;
+        private String close;
+        private Boolean available;
+        private Double lat;
+        private Double log;
         private String image;
+
     }
 }
-
-
