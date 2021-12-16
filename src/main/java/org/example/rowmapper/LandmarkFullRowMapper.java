@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+// Полный
 @Component
 public class LandmarkFullRowMapper implements  RowMapper<LandmarkFullModel> {
     @Override

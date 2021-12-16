@@ -20,7 +20,7 @@ public class LandmarkFullModel {
     private String close;
     private Boolean available;
     private Double lat;
-    private Double log;
+    private Double lon;
     private String image;
 
 }

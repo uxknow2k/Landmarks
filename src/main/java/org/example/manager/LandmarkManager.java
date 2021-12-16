@@ -74,8 +74,8 @@ public class LandmarkManager {
                                     item.getOpen(),
                                     item.getClose(),
                                     item.getAvailable(),
-                                    item.getLog(),
                                     item.getLat(),
+                                    item.getLon(),
                                     item.getImage()
                             ))
                     .collect(Collectors.toList()));
@@ -131,7 +131,7 @@ public class LandmarkManager {
                     item.getOpen(),
                     item.getClose(),
                     item.getAvailable(),
-                    item.getLog(),
+                    item.getLon(),
                     item.getLat(),
                     item.getImage()
             ));
@@ -183,6 +183,11 @@ public class LandmarkManager {
                 item.getLandmarkDescription(),
                 item.getLandmarkWebSite(),
                 item.getLandmarkPhone(),
+                item.getOpen(),
+                item.getClose(),
+                item.getAvailable(),
+                item.getLat(),
+                item.getLon(),
                 item.getImage()
         ));
         return responseDTO;
@@ -219,12 +224,17 @@ public class LandmarkManager {
                     item.getId(),
                     item.getName(),
                     item.getCity(),
-                    item.getImage(),
                     item.getLandmarkAddress(),
                     item.getUndergrounds(),
                     item.getLandmarkDescription(),
                     item.getLandmarkWebSite(),
-                    item.getLandmarkPhone()
+                    item.getLandmarkPhone(),
+                    item.getOpen(),
+                    item.getClose(),
+                    item.getAvailable(),
+                    item.getLat(),
+                    item.getLon(),
+                    item.getImage()
             ));
             return responseDTO;
         } catch (EmptyResultDataAccessException e) {

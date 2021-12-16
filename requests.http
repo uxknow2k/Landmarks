@@ -19,8 +19,12 @@ Content-Type: application/json
   "undergrounds": "Красная площадь",
   "landmarkDescription": "Самая высокая башня мира",
   "landmarkWebSite": "default",
-  "workingTime": "default",
-  "landmarkPhone": "default"
+  "open": ,
+  "close": ,
+  "available": ,
+  "landmarkPhone": "default",
+  "lat": ,
+  "log": ,
 }
 
 ### removeById

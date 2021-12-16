@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+// Сокрашенный
 @Component
 public class LandmarkBasicRowMapper implements RowMapper<LandmarkBasicModel> {
     @Override
