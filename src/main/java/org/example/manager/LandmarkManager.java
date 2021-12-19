@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.example.dto.LandmarkGetDistanceBetweenPlacesDTO.*;
+
 @Component
 @RequiredArgsConstructor
 public class LandmarkManager {
@@ -47,7 +49,7 @@ public class LandmarkManager {
         return responseDTO;
     }
 
-    public LandmarkGetFullAllResponseDTO getFullAllResponseDTO() {
+    public LandmarkGetDistanceBetweenPlacesDTO getFullAllResponseDTO() {
         try {
             final List<LandmarkFullModel> items = template.query(
                     // language=PostgreSQL
@@ -58,11 +60,11 @@ public class LandmarkManager {
                             """,
                     landmarkFullMapper
             );
-            LandmarkGetFullAllResponseDTO responseDTO = new LandmarkGetFullAllResponseDTO();
+            LandmarkGetDistanceBetweenPlacesDTO responseDTO = new LandmarkGetDistanceBetweenPlacesDTO();
             responseDTO.setLandmarks(items
                     .stream()
                     .map(item ->
-                            new LandmarkGetFullAllResponseDTO.Landmark(
+                            new Landmark(
                                     item.getId(),
                                     item.getName(),
                                     item.getCity(),
@@ -88,20 +90,24 @@ public class LandmarkManager {
 
     public double getDistanceBetweenPlaces(long sourceId, double lat, double lon) {
         LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(sourceId);
-        return distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLog(),
+        return distanceFormula(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLog(),
                 lat, lon);
     }
 
-    public List<LandmarkGetFullAllResponseDTO.Landmark> getAllInThisRadius(long sourceId, double radius) {
-        LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(sourceId);
-        LandmarkGetFullAllResponseDTO responseDTO = getFullAllResponseDTO();
-        List<LandmarkGetFullAllResponseDTO.Landmark> result = new ArrayList<>();
-        for (LandmarkGetFullAllResponseDTO.Landmark landmark : responseDTO.getLandmarks()) {
-            if (radius > distance(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLog(),
-                    landmark.getLat(), landmark.getLog())) {
+    public List<Landmark> getAllInThisRadius(long id, double lat, double lon, int radius) {
+        LandmarkGetByIdResponseDTO landmarkGetByIdResponseDTO = getById(id);
+        LandmarkGetDistanceBetweenPlacesDTO responseDTO = getFullAllResponseDTO();
+        List<LandmarkGetDistanceBetweenPlacesDTO.Landmark> result = new ArrayList<>();
+        for (LandmarkGetDistanceBetweenPlacesDTO.Landmark landmark : responseDTO.getLandmarks()) {
+            if (
+                    radius > distanceFormula(landmarkGetByIdResponseDTO.getLandmark().getLat(), landmarkGetByIdResponseDTO.getLandmark().getLog(),
+                            landmark.getLat(), landmark.getLog())) ;
+            {
                 result.add(landmark);
             }
         }
+
+
         return result;
     }
 
@@ -146,29 +152,32 @@ public class LandmarkManager {
         return requestDTO.getId() == 0 ? create(requestDTO) : update(requestDTO);
     }
 
+
     private LandmarkSaveResponseDTO create(LandmarkSaveRequestDTO requestDTO) {
         final LandmarkFullModel item = template.queryForObject(
                 // language=PostgreSQL
                 """
                         INSERT INTO landmarks (name, city, landmark_address, undergrounds, landmark_description, 
-                            landmark_web_site, landmark_phone, image, open, close)  
+                            landmark_web_site, landmark_phone, image, open, close, lat, lon)  
                             VALUES (:name, :city, :landmarkAddress, :undergrounds, 
-                            :landmarkDescription, :landmarkWebSite, :workingTime, :landmarkPhone, :image, :open::time with time zone AT TIME ZONE  'UTC',
-                            :close::time with time zone AT TIME ZONE  'UTC')
+                            :landmarkDescription, :landmarkWebSite, :landmarkPhone, :image, :open::time with time zone AT TIME ZONE  'UTC',
+                            :close::time with time zone AT TIME ZONE  'UTC', :lat, :lon)
                         RETURNING id, name, city, landmark_address, undergrounds, landmark_description, 
-                            landmark_web_site, landmark_phone, image, open, close
+                            landmark_web_site, landmark_phone, image, open, close, CURRENT_TIME BETWEEN open AND close AS available, lat, lon
                         """,
-                Map.of(
-                        "name", requestDTO.getName(),
-                        "city", requestDTO.getCity(),
-                        "landmarkAddress", requestDTO.getLandmarkAddress(),
-                        "undergrounds", requestDTO.getUndergrounds(),
-                        "landmarkDescription", requestDTO.getLandmarkDescription(),
-                        "landmarkWebSite", requestDTO.getLandmarkWebSite(),
-                        "landmarkPhone", requestDTO.getLandmarkPhone(),
-                        "image", requestDTO.getImage() == null ? defaultImage : requestDTO.getImage(),
-                        "open", "08:00 +03:00",
-                        "close", "20:00 +03:00"
+                Map.ofEntries(
+                        Map.entry("name", requestDTO.getName()),
+                        Map.entry("city", requestDTO.getCity()),
+                        Map.entry("landmarkAddress", requestDTO.getLandmarkAddress()),
+                        Map.entry("undergrounds", requestDTO.getUndergrounds()),
+                        Map.entry("landmarkDescription", requestDTO.getLandmarkDescription()),
+                        Map.entry("landmarkWebSite", requestDTO.getLandmarkWebSite()),
+                        Map.entry("landmarkPhone", requestDTO.getLandmarkPhone()),
+                        Map.entry("image", requestDTO.getImage() == null ? defaultImage : requestDTO.getImage()),
+                        Map.entry("open", requestDTO.getOpen()),
+                        Map.entry("close", requestDTO.getClose()),
+                        Map.entry("lat", requestDTO.getLon()),
+                        Map.entry("lon", requestDTO.getLat())
                 ),
                 landmarkFullMapper
 
@@ -182,10 +191,10 @@ public class LandmarkManager {
                 item.getUndergrounds(),
                 item.getLandmarkDescription(),
                 item.getLandmarkWebSite(),
-                item.getLandmarkPhone(),
                 item.getOpen(),
                 item.getClose(),
                 item.getAvailable(),
+                item.getLandmarkPhone(),
                 item.getLat(),
                 item.getLon(),
                 item.getImage()
@@ -200,10 +209,10 @@ public class LandmarkManager {
                     """
                             UPDATE landmarks SET  name = :name, city = :city, image = :image, landmark_address = :landmarkAddress, 
                             undergrounds = :undergrounds, landmark_description = :landmarkDescription, 
-                                landmark_web_site = :landmarkWebSite, landmark_phone = :landmarkPhone
+                                landmark_web_site = :landmarkWebSite, landmark_phone = :landmarkPhone, lat = :lat, lon = :lon
                                 WHERE id = :id and removed = FALSE
                             RETURNING id, name, city, image, landmark_address, undergrounds, landmark_description, 
-                                landmark_web_site, landmark_phone
+                                landmark_web_site, landmark_phone, lat, lon
                             """,
                     Map.of(
                             "id", requestDTO.getId(),
@@ -213,8 +222,9 @@ public class LandmarkManager {
                             "landmarkPhone", requestDTO.getLandmarkPhone(),
                             "image", requestDTO.getImage() == null ? defaultImage : requestDTO.getImage(),
                             "open", "08:00 +03:00",
-                            "close", "20:00 +03:00"
-
+                            "close", "20:00 +03:00",
+                            "lat", requestDTO.getLat(),
+                            "lon", requestDTO.getLon()
                     ),
                     landmarkFullMapper
 
@@ -228,10 +238,10 @@ public class LandmarkManager {
                     item.getUndergrounds(),
                     item.getLandmarkDescription(),
                     item.getLandmarkWebSite(),
-                    item.getLandmarkPhone(),
                     item.getOpen(),
                     item.getClose(),
                     item.getAvailable(),
+                    item.getLandmarkPhone(),
                     item.getLat(),
                     item.getLon(),
                     item.getImage()
@@ -257,7 +267,7 @@ public class LandmarkManager {
                 Map.of("id", id)
         );
         if (affected == 0) {
-            throw new LandmarkNotFoundException("landmark with id " + id + " not found");
+            throw new LandmarkNotFoundException("landmark c таким id(" + id + ") не найден.");
         }
     }
 
@@ -270,11 +280,12 @@ public class LandmarkManager {
                 Map.of("id", id)
         );
         if (affected == 0) {
-            throw new LandmarkNotFoundException("landmark with id " + id + " not found");
+            throw new LandmarkNotFoundException("landmark c таким id(" + id + ") не найден.");
         }
     }
-        private double distance (double lat, double lon, double lat2, double lon2) {
-            return (1111.2 * Math.sqrt((lon - lon2) * (lon - lon2) + (lat - lat2) * Math.cos(Math.PI * lon / 180) * (lat - lat2) * Math.cos(Math.PI * lon / 180)));
-        }
+
+    private int distanceFormula(double lat, double lon, double lat2, double lon2) {
+        return (int) (1111.2 * Math.sqrt((lon - lon2) * (lon - lon2) + (lat - lat2) * Math.cos(Math.PI * lon / 180) * (lat - lat2) * Math.cos(Math.PI * lon / 180)));
     }
+}
 

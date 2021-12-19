@@ -26,7 +26,7 @@ public class LandmarkSaveResponseDTO {
         private Boolean available;
         private String landmarkPhone;
         private Double lat;
-        private Double log;
+        private Double lon;
         private String image;
     }
 }

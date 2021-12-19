@@ -1,7 +1,3 @@
--- TODO:
---  1. Реализовать открыто/закрыто с привязкой текущего времени (мск)
-
-
 CREATE TABLE landmarks
 (
     id                   BIGSERIAL PRIMARY KEY,
@@ -20,3 +16,13 @@ CREATE TABLE landmarks
     open                 time with time zone,
     close                time with time zone
 );
+
+CREATE TABLE rateUp
+(
+  id BIGSERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  city TEXT NOT NULL,
+  image TEXT NOT NULL,
+  landmark_address TEXT NOT NULL,
+  rate DOUBLE PRECISION NOT NULL CHECK ( rate >= 0 and rate <=5 )
+)

@@ -1,34 +1,39 @@
-### get all
+### get all ###
 GET http://localhost:8080/landmarks/getAll
 
-### get by ID
+### get by ID ###
 GET http://localhost:8080/landmarks/getById/1
 
-### trying search wrong ID
+### trying search wrong ID ###
 GET http://localhost:8080/landmarks/getById/999
 
-### New json without image
+### New json without image ###
 POST http://localhost:8080/landmarks/save
 Content-Type: application/json
 
 {
   "id": 0,
-  "name": "Башня",
+  "name": "Башня24",
   "city": "Москва",
   "landmarkAddress": "ул. Петрозаводская, 18",
   "undergrounds": "Красная площадь",
   "landmarkDescription": "Самая высокая башня мира",
   "landmarkWebSite": "default",
-  "open": ,
-  "close": ,
-  "available": ,
   "landmarkPhone": "default",
-  "lat": ,
-  "log": ,
+  "open": "08:00:00+00",
+  "close": "20:00:00+00",
+  "lat": "55.8199081",
+  "lon": "37.6116028"
 }
 
-### removeById
+### removeById ###
 POST http://localhost:8080/landmarks/removeById/1
 
-### restoreById
-POST http://localhost:8080/landmarks/restoreById/1
+### restoreById ###
+http://localhost:8080/landmarks/restoreById/1
+
+### Check distance around radius (metr) ###
+http://localhost:8080/landmarks/distance/radius/1?radius=10000
+
+### Check distance between places ###
+http://localhost:8080/landmarks/distance/1?lat=55.8152578&lon=49.1322532
