@@ -30,10 +30,12 @@ Content-Type: application/json
 POST http://localhost:8080/landmarks/removeById/1
 
 ### restoreById
-http://localhost:8080/landmarks/restoreById/1
+POST http://localhost:8080/landmarks/restoreById/1
 
-### Check distance around radius (metr)
-http://localhost:8080/landmarks/distance/radius/1?radius=10000
+// TODO: реазиловать
+// ### Check distance around radius (metr)
+// http://localhost:8080/landmarks/distance/radius/lat=55.8152578&lon=49.1322532%radius=10000
 
 ### Check distance between places
 http://localhost:8080/landmarks/distance/1?lat=55.8152578&lon=49.1322532
+
