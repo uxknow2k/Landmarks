@@ -25,8 +25,8 @@ public class LandmarkGetByIdResponseDTO {
         private String open;
         private String close;
         private Boolean available;
-        private Double lat;
-        private Double log;
+        private Float lat;
+        private Float lon;
         private String image;
 
     }

@@ -27,8 +27,8 @@ public class LandmarkGetFullAllResponseDTO {
         private String open;
         private String close;
         private Boolean available;
-        private Double lat;
-        private Double log;
+        private Float lat;
+        private Float log;
         private String image;
 
     }

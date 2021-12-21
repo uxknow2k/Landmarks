@@ -27,9 +27,6 @@ public class LandmarkGetDistanceBetweenPlacesDTO {
         private String open;
         private String close;
         private Boolean available;
-        private Double lat;
-        private Double log;
-        private String image;
 
     }
 }
