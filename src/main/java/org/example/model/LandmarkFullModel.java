@@ -19,8 +19,8 @@ public class LandmarkFullModel {
     private String open;
     private String close;
     private Boolean available;
-    private Double lat;
-    private Double lon;
+    private Float lat;
+    private Float lon;
     private String image;
 
 }
