@@ -46,7 +46,7 @@ public class LandmarksController {
 
     @GetMapping("/distance/radius/")
     @ResponseBody
-    public List<LandmarkGetDistanceBetweenPlacesDTO.Landmark> getDistance(@PathVariable long id, @RequestParam double lat, @RequestParam double lon, @RequestParam int radius) {
+    public LandmarkGetDistanceBetweenPlacesDTO getDistancePlaces(@PathVariable long id, @RequestParam float lat, @RequestParam float lon, @RequestParam int radius) {
         return manager.getAllInThisRadius(id, lat, lon, radius);
     }
 }
