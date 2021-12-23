@@ -1,11 +1,14 @@
 version: '3.7'
 services:
+  # Первый сервис - db
   db:
+    # Образ на основе которого он будет запускаться
     image: postgres:14-alpine
     ports:
       - '5432:5432'
     volumes:
       - ./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d:ro
+      # Переменные окружения
     environment:
       - POSTGRES_DB=db
       - POSTGRES_USER=app
