@@ -290,9 +290,8 @@ public class LandmarkManager {
         }
     }
 
-    public LandmarkGetDistanceBetweenPlacesDTO getAllInThisRadius(long id, float lon, float lat, int radius) {
-        LandmarkFullModel landmarkFullModel = getFullAllResponseDTOById(id);
-        LandmarkGetDistanceBetweenPlacesDTO result = getAllInRadius(landmarkFullModel.getLat(), landmarkFullModel.getLon(), radius);
+    public LandmarkGetDistanceBetweenPlacesDTO getAllInThisRadius(float lon, float lat, int radius) {
+        LandmarkGetDistanceBetweenPlacesDTO result = getAllInRadius(lat, lon, radius);
         return result;
     }
 

@@ -44,10 +44,10 @@ public class LandmarksController {
         return manager.getDistanceBetweenPlaces(id, lat, lon);
     }
 
-    @GetMapping("/distance/radius/")
+    @GetMapping("/distance/radius")
     @ResponseBody
-    public LandmarkGetDistanceBetweenPlacesDTO getDistancePlaces(@PathVariable long id, @RequestParam float lat, @RequestParam float lon, @RequestParam int radius) {
-        return manager.getAllInThisRadius(id, lat, lon, radius);
+    public LandmarkGetDistanceBetweenPlacesDTO getDistancePlaces(@RequestParam float lat, @RequestParam float lon, @RequestParam int radius) {
+        return manager.getAllInThisRadius(lat, lon, radius);
     }
 }
 
